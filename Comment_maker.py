@@ -50,7 +50,7 @@ for file in files_to_process:
     table_name = os.path.splitext(os.path.basename(file))[0]
 
     # Determine the output file path
-    output_file_path = os.path.join(output_directory, f"{table_name}.sql")
+    output_file_path = os.path.join(output_directory, f"{table_name}.plsql")
 
     # Open the output .sql file
     with open(output_file_path, "w") as sql_file:
@@ -61,8 +61,10 @@ for file in files_to_process:
         # Iterate over the DataFrame and generate the SQL comments
         for index, row in df.iterrows():
 
-            changeset_line = f"-- changeset {args.author}:{index+1}"
-            comment_line = f"comment on {args.schema}.{table_name}.{row['Column']} is '{row['Description']}';"
+            escaped_description = row['Description'].replace("'", "''")
+            
+            changeset_line = f"--changeset {args.author}:{index}"
+            comment_line = f"comment on column {args.schema}.{table_name}.{row['Column']} is '{escaped_description}';"
 
             # Print the lines to the console
             print(changeset_line)
